@@ -2,12 +2,12 @@
 
 CRM comercial para vidraçarias, conectado a um agente de IA que atende clientes pelo WhatsApp. O agente qualifica o pedido, agenda visitas e envia orçamentos; o CRM mostra tudo em tempo real para a equipe comercial.
 
-**🔗 Acesse:** [SEU-LINK.vercel.app](https://SEU-LINK.vercel.app)
+**🔗 Acesse:** [vidra-crm.vercel.app](https://vidra-crm.vercel.app)
 
 | Acesso de demonstração | |
 | --- | --- |
-| Email | `SEU-EMAIL-DEMO` |
-| Senha | `SUA-SENHA-DEMO` |
+| Email | `demo@vidracrm.com` |
+| Senha | `123456789` |
 
 A conta de demonstração usa uma empresa isolada com dados fictícios: você pode criar, editar e mover registros à vontade. Nenhuma ação dela dispara mensagens reais.
 
