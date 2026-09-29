@@ -1,0 +1,276 @@
+/* Ajustes por largura de tela e preferências do usuário. */
+@media (min-width: 1600px) {
+  main {
+    padding: 40px 48px;
+  }
+  .chart {
+    height: 290px;
+  }
+  .sidebar {
+    width: 256px;
+  }
+  .main-shell {
+    margin-left: 256px;
+  }
+}
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 216px;
+    padding-inline: 12px;
+  }
+  .main-shell {
+    margin-left: 216px;
+  }
+  main {
+    padding: 26px 24px;
+  }
+  .topbar {
+    padding-inline: 24px;
+  }
+  .stats-grid {
+    gap: 12px;
+  }
+  .stat-card {
+    padding: 18px 16px;
+  }
+  .stat-card > strong {
+    font-size: 24px;
+  }
+  .secondary-stats > div {
+    padding: 16px 14px;
+  }
+  .secondary-stats strong {
+    font-size: var(--fs-lg);
+  }
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 16px;
+  }
+  .panel-heading {
+    padding: 18px 18px 0;
+  }
+  .report-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 980px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dashboard-grid,
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .secondary-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .page-heading {
+    align-items: flex-start;
+  }
+  .page-heading h1 {
+    font-size: 26px;
+  }
+  .topbar-right {
+    gap: 12px;
+  }
+  .today {
+    display: none;
+  }
+  .report-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .login-story {
+    padding: 40px 35px;
+  }
+  .login-form {
+    padding: 35px;
+  }
+  .login-story h1 {
+    font-size: 38px;
+  }
+}
+@media (max-width: 760px) {
+  :root {
+    /* 16px evita o zoom automático de campos no iOS */
+    --input-fs: 16px;
+  }
+  .sidebar {
+    transform: translateX(-100%);
+    visibility: hidden;
+    width: 260px;
+    transition:
+      transform 0.2s var(--ease),
+      visibility 0.2s;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  .main-shell {
+    margin-left: 0;
+  }
+  .mobile-menu,
+  .mobile-close {
+    display: inline-flex;
+  }
+  .mobile-close {
+    position: absolute;
+    top: 10px;
+    right: 8px;
+    color: var(--side-text);
+  }
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 31, 26, 0.45);
+    border: 0;
+    z-index: 29;
+  }
+  .topbar {
+    height: 62px;
+    padding: 0 16px;
+  }
+  main {
+    padding: 24px 16px;
+  }
+  .page-heading {
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+  .stat-card > strong {
+    font-size: 24px;
+  }
+  .secondary-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .toolbar {
+    padding: 16px;
+    gap: 10px;
+  }
+  .search {
+    flex-basis: 100%;
+  }
+  .filter {
+    flex: 1;
+    min-width: 125px;
+  }
+  .filter input,
+  .filter select {
+    max-width: 100%;
+    width: 100%;
+  }
+  .detail-section {
+    padding: 18px;
+  }
+  .panel-heading {
+    flex-wrap: wrap;
+  }
+  .panel-heading .text-link {
+    margin-left: auto;
+  }
+  .details-list {
+    gap: 16px;
+  }
+  .upload-form .field {
+    flex-basis: 100%;
+  }
+  .upload-form input[type="file"] {
+    max-width: 100%;
+  }
+  .report-stats {
+    gap: 12px;
+  }
+  .report-stats .stat-card > strong {
+    font-size: var(--fs-xl);
+  }
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+  .login-story {
+    min-height: 220px;
+    padding: 25px;
+  }
+  .login-story > .brand {
+    font-size: 30px;
+  }
+  .login-story .eyebrow,
+  .glass-art,
+  .login-story > small,
+  .login-story p {
+    display: none;
+  }
+  .login-story h1 {
+    font-size: 27px;
+    line-height: 1.2;
+    margin: 27px 0 0;
+    letter-spacing: -0.5px;
+  }
+  .login-story h1 br {
+    display: none;
+  }
+  .login-story h1 em {
+    display: block;
+  }
+  .login-form {
+    padding: 38px 24px;
+  }
+  .login-form-inner {
+    max-width: 420px;
+  }
+  .login-form h2 {
+    font-size: 26px;
+  }
+  .login-form-inner > .login-help {
+    margin-bottom: 0;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .span-2 {
+    grid-column: auto;
+  }
+  .form-grid .field {
+    width: 100%;
+  }
+  dialog {
+    padding: 20px;
+  }
+  .modal-heading h2 {
+    font-size: 18px;
+  }
+  footer {
+    padding: 18px 16px;
+    flex-wrap: wrap;
+  }
+  .heading-actions {
+    width: 100%;
+  }
+  .heading-actions .button {
+    flex: 1;
+  }
+  .pipeline-tools {
+    flex-wrap: wrap;
+  }
+  .kanban-column {
+    flex-basis: 264px;
+  }
+  .chart {
+    height: 240px;
+  }
+  .attention-list {
+    max-height: 320px;
+  }
+  .topbar-left {
+    font-size: var(--fs-xs);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

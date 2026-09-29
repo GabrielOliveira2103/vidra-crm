@@ -1,0 +1,95 @@
+/* Design tokens: única fonte de verdade para cor, tipografia, espaço e sombra. */
+:root {
+  /* Tipografia */
+  --font-sans: "DM Sans Variable", "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Manrope Variable", "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Escala tipográfica (mínimo de 11px, apenas para rótulos em caixa-alta) */
+  --fs-2xs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+  --fs-2xl: 24px;
+  --fs-3xl: 30px;
+  --input-fs: 14px;
+
+  /* Marca */
+  --green-50: #edf6f0;
+  --green-100: #d8ecdf;
+  --green-200: #c5e0cf;
+  --green: #1a7a5a;
+  --green-dark: #0f5940;
+  --green-darker: #0a4531;
+  --lime: #dcedbb;
+  --lime-strong: #b9d898;
+  --dark: #0a1f1a;
+  --dark-2: #071b16;
+
+  /* Neutros */
+  --bg: #f3f6f4;
+  --surface: #fff;
+  --surface-2: #f8faf8;
+  --surface-3: #edf1ee;
+  --text: #14231c;
+  --text-2: #3d4f44;
+  --muted: #4f6055;
+  --line: #e2e8e3;
+  --line-soft: #ebefec;
+  --line-strong: #cfd9d2;
+  --scroll: #c7d6cc;
+
+  /* Barra lateral */
+  --side-text: #c6dcd0;
+  --side-muted: #a9c6b6;
+  --side-line: rgba(255, 255, 255, 0.1);
+  --side-hover: rgba(255, 255, 255, 0.07);
+
+  /* Foco e feedback */
+  --focus: #157a58;
+  --danger: #8a3d31;
+  --danger-bg: #fff1ee;
+  --danger-line: #f0d4ce;
+  --warn-bg: #fbf1dd;
+  --warn-fg: #6f5116;
+  --warn-line: #efdfb8;
+
+  /* Tons de status: fundo e texto (todos com contraste AA) */
+  --tone-blue-bg: #e9f0fc;
+  --tone-blue-fg: #3f5f86;
+  --tone-violet-bg: #eceafb;
+  --tone-violet-fg: #6656a0;
+  --tone-amber-bg: #fbf1dc;
+  --tone-amber-fg: #76581a;
+  --tone-teal-bg: #e8f2f3;
+  --tone-teal-fg: #3d7274;
+  --tone-slate-bg: #e7eee9;
+  --tone-slate-fg: #4f6357;
+  --tone-indigo-bg: #eef0ff;
+  --tone-indigo-fg: #57639e;
+  --tone-orange-bg: #f8eee1;
+  --tone-orange-fg: #7a5626;
+  --tone-green-bg: #e6f3e8;
+  --tone-green-fg: #366b48;
+  --tone-red-bg: #f8eae7;
+  --tone-red-fg: #8a4438;
+
+  /* Etapas do pipeline */
+  --stage-default: #8a8fbb;
+  --stage-novo: #6f9bc8;
+  --stage-negociacao: #c29a4a;
+  --stage-fechado: #4f9a68;
+  --stage-perdido: #bb7e6e;
+
+  /* Forma e profundidade */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(17, 44, 33, 0.06), 0 1px 1px rgba(17, 44, 33, 0.04);
+  --shadow-md: 0 8px 20px rgba(17, 44, 33, 0.08), 0 2px 6px rgba(17, 44, 33, 0.05);
+  --shadow-lg: 0 24px 70px rgba(10, 35, 26, 0.18);
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+}
