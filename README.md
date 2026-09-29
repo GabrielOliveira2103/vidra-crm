@@ -11,6 +11,14 @@ CRM comercial para vidraçarias, conectado a um agente de IA que atende clientes
 
 A conta de demonstração usa uma empresa isolada com dados fictícios: você pode criar, editar e mover registros à vontade. Nenhuma ação dela dispara mensagens reais.
 
+## O agente em ação
+
+Conversa com o agente pelo WhatsApp: ele coleta nome, serviço, local e medidas, agenda a visita técnica e cancela quando o cliente pede. Tudo o que ele registra aparece no CRM.
+
+<!-- VIDEO-DEMO -->
+
+## O CRM
+
 ![Visão geral do CRM](docs/screenshots/dashboard-desktop.png)
 
 | Pipeline | Detalhe do lead com a conversa da IA | Celular |
