@@ -5,7 +5,7 @@ import { useCRM } from "../contexts/CRMContext";
 import { PageHeader, SearchBox } from "../components/ui/Common";
 import { LEAD_STATUS } from "../utils/constants";
 import { date, daysSince, money, errorMessage } from "../utils/format";
-import { latestQuote } from "../utils/analytics";
+import { latestQuote, serviceName } from "../utils/analytics";
 export default function Pipeline() {
   const { data, save } = useCRM();
   const [search, setSearch] = useState("");
@@ -28,7 +28,7 @@ export default function Pipeline() {
     }
   }
   const rows = data.leads.filter((l) =>
-    `${data.clientes.find((c) => c.id === l.cliente_id)?.nome} ${data.servicos.find((s) => s.id === l.servico)?.nome}`
+    `${data.clientes.find((c) => c.id === l.cliente_id)?.nome} ${serviceName(data, l.servico)}`
       .toLowerCase()
       .includes(search.toLowerCase()),
   );
@@ -70,12 +70,14 @@ export default function Pipeline() {
                       <Link to={`/leads/${l.id}`}>
                         <strong>{c?.nome}</strong>
                         <span>
-                          {data.servicos.find((s) => s.id === l.servico)?.nome}
+                          {serviceName(data, l.servico)}
                         </span>
                       </Link>
                       <p>
                         <MapPin size={13} />
-                        {[l?.cidade, l?.bairro].filter(Boolean).join(" • ") ||
+                        {[l.cidade || c?.cidade, l.bairro || c?.bairro]
+                          .filter(Boolean)
+                          .join(" • ") ||
                           "Local não informado"}
                       </p>
                       <p>

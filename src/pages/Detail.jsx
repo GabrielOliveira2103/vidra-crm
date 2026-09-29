@@ -6,6 +6,7 @@ import { Badge, PageHeader, Table, Empty } from "../components/ui/Common";
 import RecordForm from "../components/RecordForm";
 import LeadFiles from "../components/LeadFiles";
 import { LEAD_STATUS, INTERACTION_TYPES } from "../utils/constants";
+import { serviceName } from "../utils/analytics";
 import {
   date,
   dateTime,
@@ -101,7 +102,7 @@ export default function Detail({ clientMode = false }) {
         subtitle={
           clientMode
             ? "Histórico completo do relacionamento comercial."
-            : data.servicos.find((s) => s.id === lead.servico)?.nome
+            : serviceName(data, lead.servico)
         }
       >
         <button
@@ -215,7 +216,7 @@ export default function Detail({ clientMode = false }) {
                   <Link key={l.id} to={`/leads/${l.id}`}>
                     <div>
                       <strong>
-                        {data.servicos.find((s) => s.id === l.servico)?.nome}
+                        {serviceName(data, l.servico)}
                       </strong>
                       <small>
                         {date(l.created_at)}{" "}

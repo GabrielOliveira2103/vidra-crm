@@ -1,6 +1,9 @@
 import { dayKey, shiftDay, inRange, daysSince } from "./format.js";
 import { ACTIVE_VISIT_STATUS } from "./constants.js";
 const isClientMessage = (i) => i?.origem === "cliente";
+// Leads podem guardar o ID do catálogo ou o nome do serviço em texto (n8n)
+export const serviceName = (data, servico) =>
+  data.servicos.find((s) => s.id === servico)?.nome || servico || "";
 export function latestQuote(data, leadId) {
   const quotes = data.orcamentos.filter((q) => q.lead_id === leadId);
   return (

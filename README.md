@@ -13,6 +13,10 @@ A conta de demonstração usa uma empresa isolada com dados fictícios: você po
 
 ![Visão geral do CRM](docs/screenshots/dashboard-desktop.png)
 
+| Pipeline | Detalhe do lead com a conversa da IA | Celular |
+| --- | --- | --- |
+| ![Pipeline](docs/screenshots/pipeline.png) | ![Detalhe do lead](docs/screenshots/lead-detalhe.png) | ![Celular](docs/screenshots/dashboard-mobile.png) |
+
 ## Arquitetura
 
 ```mermaid
@@ -50,6 +54,18 @@ React 19 · Vite · React Router · Supabase (PostgreSQL, Auth, Storage, Realtim
 - **Storage privado:** bucket fechado, tipos e tamanho de arquivo validados no servidor, acesso por URL assinada de 5 minutos.
 - **Frontend:** apenas a chave pública do Supabase no bundle (o cliente recusa chaves secretas), Content-Security-Policy restritiva, HSTS e proteção contra clickjacking configurados no `vercel.json`.
 
+## Decisões e desafios
+
+**Isolar empresas sem confiar no cliente.** O isolamento é feito no banco, não no frontend: toda política RLS compara `empresa_id` com `crm_empresa_id()`, uma função `SECURITY DEFINER` que busca a empresa na tabela `crm_usuarios` pelo `auth.uid()`. Ela nunca lê `user_metadata`, que o próprio usuário pode preencher no cadastro e usar para se colocar em outra empresa.
+
+**Banco e automação conversando nos dois sentidos.** O n8n escreve no banco pela API do Supabase; o caminho de volta usa gatilhos PostgreSQL com `pg_net`, que chamam os webhooks do n8n só quando o status realmente muda (`old.status IS DISTINCT FROM new.status`), evitando loops e mensagens duplicadas. Cada chamada leva uma chave guardada no Supabase Vault, e o n8n recusa as que chegam sem ela.
+
+**Adaptar o CRM a um banco em produção.** O agente do n8n evoluiu o schema (colunas como `enviado_em` e `data_visita`) depois que o CRM foi escrito. Em vez de renomear colunas e quebrar os fluxos em produção, o banco ganhou colunas geradas (`valor_final`, `data_envio`) e o CRM passou a ler os nomes reais. Um diagnóstico SQL comparando o schema em produção com o que o frontend usa encontrou todas as divergências de uma vez.
+
+**Uma demo pública sem risco.** A conta de demonstração tem senha pública, então a proteção está no que ela alcança: uma empresa própria marcada como demonstração, cujos gatilhos não chamam o n8n, com telefones de DDD inexistente. Um script SQL idempotente recria os dados com datas relativas ao dia, para o painel sempre parecer vivo.
+
+**Métricas que batem com o negócio.** Faturamento soma apenas o orçamento aceito de leads fechados, agrupado pela data de fechamento e no fuso de São Paulo. Conversão usa a coorte de leads criada no período. Essas regras têm testes automatizados.
+
 ## Executar localmente
 
 Requer Node.js 22.12+ e um projeto Supabase.
@@ -77,7 +93,7 @@ Use somente a chave **anon/publishable** no `.env`: variáveis `VITE_*` ficam p�
 - `supabase/seed/001_servicos.sql`: catálogo de serviços.
 - `supabase/seed/003_empresa_demonstracao.sql`: cria ou reseta a empresa de demonstração com dados fictícios e datas relativas ao dia da execução.
 
-Mais detalhes em [docs/SUPABASE_STORAGE.md](docs/SUPABASE_STORAGE.md) e [docs/INTEGRACAO_N8N.md](docs/INTEGRACAO_N8N.md).
+Mais detalhes sobre arquivos em [docs/SUPABASE_STORAGE.md](docs/SUPABASE_STORAGE.md).
 
 ## Estrutura
 
@@ -94,3 +110,7 @@ src/
 supabase/         # migrations e seeds
 tests/            # testes unitários e de navegador
 ```
+
+## Autor
+
+**Gabriel Oliveira** · [LinkedIn](https://www.linkedin.com/in/gabriel-de-oliveiraa) · [GitHub](https://github.com/GabrielOliveira2103)
