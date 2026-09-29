@@ -17,6 +17,10 @@ Conversa com o agente pelo WhatsApp: ele coleta nome, serviço, local e medidas,
 
 <!-- VIDEO-DEMO -->
 
+https://github.com/user-attachments/assets/cf61a82c-d863-497e-948c-f7cf936b1651
+
+
+
 ## O CRM
 
 ![Visão geral do CRM](docs/screenshots/dashboard-desktop.png)
