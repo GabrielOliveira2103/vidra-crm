@@ -58,5 +58,8 @@ export function errorMessage(error) {
     return "O registro relacionado não existe ou está em uso.";
   if (error?.code === "42501")
     return "Seu usuário não está autorizado. Solicite a liberação ao administrador.";
+  // Update bloqueado pela RLS não retorna linhas
+  if (error?.code === "PGRST116")
+    return "Seu usuário não tem permissão para alterar este registro.";
   return error?.message || "Não foi possível concluir. Tente novamente.";
 }

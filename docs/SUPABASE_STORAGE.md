@@ -1,20 +1,30 @@
 # Storage privado
 
-A migration `202609080002_storage.sql` cria o bucket **lead-arquivos**, privado, limite 10 MB por arquivo, MIME types `image/jpeg`, `image/png`, `image/webp`, `application/pdf`. Se criado manualmente, use os mesmos valores e aplique as políticas da migration; não deixe o bucket público.
+O bucket **lead-arquivos** é privado, com limite de 10 MB por arquivo e apenas os tipos `image/jpeg`, `image/png`, `image/webp` e `application/pdf`. SVG e HTML são rejeitados pelo próprio Supabase. Não deixe o bucket público.
 
-Estrutura: `<lead_uuid>/<uuid-aleatorio>-<nome-sanitizado>`. O campo `arquivos.url` armazena **somente esse caminho**, não o conteúdo, URL pública ou URL assinada. A tabela guarda tipo, nome, descrição e relação com lead.
+## Estrutura
 
-O frontend faz upload pelo SDK com `upsert: false`, registra os metadados e tenta remover o objeto se o INSERT falhar. Leitura usa URL assinada de 300 segundos, renovada a cada 240 segundos na tela. URLs assinadas funcionam como credenciais temporárias: não persista nem compartilhe publicamente. Upload aceita apenas os tipos indicados. SVG/HTML são rejeitados.
+Cada arquivo fica em `<lead_uuid>/<uuid-aleatorio>-<nome-sanitizado>`. A tabela `arquivos` guarda somente esse caminho (nunca URL pública ou assinada), além de tipo, nome, descrição e o lead relacionado.
 
-Políticas:
+## Políticas
 
-- SELECT: bucket lead-arquivos e `crm_autorizado()`.
-- INSERT: mesmas condições e primeiro diretório correspondendo a um lead existente visível.
-- DELETE: bucket lead-arquivos e membro autorizado.
-- UPDATE de objetos não é concedido por política; cada novo envio recebe outro UUID.
+Todas as políticas de `storage.objects` exigem que a primeira pasta do caminho seja um lead da empresa do usuário:
 
-Todos os membros deste CRM de empresa única podem acessar seus arquivos. Anônimos e usuários sem entrada em crm_usuarios não podem. Não configure regras públicas adicionais. A migração não altera políticas de outros buckets.
+```sql
+bucket_id = 'lead-arquivos'
+and exists (
+  select 1 from public.leads l
+  where l.id::text = split_part(objects.name, '/', 1)
+    and l.empresa_id = public.crm_empresa_id()
+)
+```
 
-A exclusão exige confirmação na interface. Primeiro remove o objeto, depois os metadados. Storage e PostgreSQL não formam uma única transação: em falha parcial pode restar um metadado sem objeto; repetir a remoção conclui a limpeza. Em falha no rollback do upload pode restar objeto órfão; o administrador deve comparar `storage.objects` com `arquivos.url` antes de remover qualquer objeto manualmente. Não há rotina automática de limpeza.
+- **SELECT, INSERT e DELETE**: permitidos só nos leads da própria empresa. Um usuário de outra empresa, inclusive a conta de demonstração, não lista nem baixa esses arquivos.
+- **UPDATE**: não concedido; cada envio recebe um UUID novo (`upsert: false`).
+- Anônimos não têm acesso.
 
-Teste real: autentique um usuário autorizado, abra um lead, envie JPG, abra a miniatura, envie PDF e abra o documento. Tente um arquivo >10 MB e MIME proibido. Saia e confirme que a aplicação não permite consulta. Uma URL assinada já emitida permanece válida até expirar; teste acesso anônimo ao bucket sem esse token para verificar RLS.
+## Fluxo no frontend
+
+- **Upload:** envia pelo SDK, grava os metadados em `arquivos` e remove o objeto se o registro falhar.
+- **Leitura:** URL assinada de 300 segundos, renovada a cada 240 segundos enquanto a tela está aberta. URLs assinadas funcionam como credenciais temporárias: não as compartilhe.
+- **Exclusão:** pede confirmação, remove o objeto e depois os metadados. Storage e PostgreSQL não formam uma transação única; em falha parcial, repetir a exclusão conclui a limpeza.
