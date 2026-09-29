@@ -15,8 +15,6 @@ A conta de demonstração usa uma empresa isolada com dados fictícios: você po
 
 Conversa com o agente pelo WhatsApp: ele coleta nome, serviço, local e medidas, agenda a visita técnica e cancela quando o cliente pede. Tudo o que ele registra aparece no CRM.
 
-<!-- VIDEO-DEMO -->
-
 https://github.com/user-attachments/assets/cf61a82c-d863-497e-948c-f7cf936b1651
 
 
