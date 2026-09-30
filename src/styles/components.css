@@ -463,6 +463,19 @@ dialog::backdrop {
   grid-template-columns: 1fr 1fr;
   gap: 18px;
 }
+.form-grid.new-client {
+  margin: 18px 0 0;
+  padding: 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.form-grid.new-client legend {
+  padding: 0 6px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+}
 .field {
   display: flex;
   flex-direction: column;

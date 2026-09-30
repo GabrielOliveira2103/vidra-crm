@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { useCRM } from "../contexts/CRMContext";
 import { Modal } from "./ui/Common";
 import {
@@ -9,6 +9,9 @@ import {
   INTERACTION_TYPES,
 } from "../utils/constants";
 import { errorMessage, normalizePhone, money } from "../utils/format";
+import { saveRecord } from "../services/crm";
+// Valor especial do select de cliente: cria o cliente junto com o lead
+const NEW_CLIENT = "__novo_cliente__";
 const field = (name, label, type = "text", required = false, options) => ({
   name,
   label,
@@ -27,24 +30,50 @@ export default function RecordForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [values, setValues] = useState({ ...defaults, ...record });
-  const clientOptions = Object.fromEntries(
-    data.clientes.map((c) => [c.id, `${c.nome} • ${c.telefone}`]),
+  const clientOptions = Object.fromEntries([
+    ...(table === "leads" && !record ? [[NEW_CLIENT, "+ Novo cliente"]] : []),
+    ...data.clientes.map((c) => [c.id, `${c.nome} • ${c.telefone}`]),
+  ]);
+  const creatingClient =
+    table === "leads" && !record && values.cliente_id === NEW_CLIENT;
+  const newClientBlock = () => (
+    <fieldset className="form-grid new-client span-2">
+      <legend>Novo cliente</legend>
+      {newClientFields.map((f) => (
+        <label key={f.name} className="field">
+          <span>
+            {f.label}
+            {f.required && " *"}
+          </span>
+          <input
+            type={f.type}
+            required={f.required}
+            maxLength={500}
+            disabled={busy}
+            value={values[f.name] ?? ""}
+            onChange={(e) => setValues({ ...values, [f.name]: e.target.value })}
+          />
+        </label>
+      ))}
+    </fieldset>
   );
+  const newClientFields = [
+    field("novo_nome", "Nome do cliente", "text", true),
+    field("novo_telefone", "Telefone com DDD", "tel", true),
+    field("novo_cidade", "Cidade"),
+    field("novo_bairro", "Bairro"),
+  ];
   const leadOptions = Object.fromEntries(
     data.leads.map((l) => {
       const cliente =
-        data.clientes.find((c) => c.id === l.cliente_id)?.nome ||
-        "Cliente";
+        data.clientes.find((c) => c.id === l.cliente_id)?.nome || "Cliente";
 
       const servico =
         data.servicos.find((s) => s.id === l.servico)?.nome ||
         l.servico ||
         "Serviço não informado";
 
-      return [
-        l.id,
-        `${cliente} • ${servico} • ${l.id.slice(0, 8)}`,
-      ];
+      return [l.id, `${cliente} • ${servico} • ${l.id.slice(0, 8)}`];
     }),
   );
   const schemas = {
@@ -154,6 +183,18 @@ export default function RecordForm({
           lead_id: defaults.lead_id || null,
           origem: "CRM",
         });
+      if (creatingClient) {
+        const text = (name) => String(values[name] || "").trim() || null;
+        const client = await saveRecord("clientes", {
+          nome: text("novo_nome"),
+          telefone: normalizePhone(text("novo_telefone")),
+          cidade: text("novo_cidade"),
+          bairro: text("novo_bairro"),
+        });
+        payload.cliente_id = client.id;
+        // Se o lead falhar, uma nova tentativa usa o cliente já criado
+        setValues((current) => ({ ...current, cliente_id: client.id }));
+      }
       if (record && table === "leads") delete payload.cliente_id;
       if (record && ["orcamentos", "visitas"].includes(table))
         delete payload.lead_id;
@@ -184,71 +225,75 @@ export default function RecordForm({
       <form onSubmit={submit}>
         <div className="form-grid">
           {schemas[table].map((f) => (
-            <label
-              key={f.name}
-              className={`field ${f.type === "textarea" ? "span-2" : ""} ${f.type === "checkbox" ? "check-field" : ""}`}
-            >
-              <span>
-                {f.label}
-                {f.required && " *"}
-              </span>
-              {f.type === "select" ? (
-                <select
-                  required={f.required}
-                  disabled={
-                    busy ||
-                    Boolean(
-                      record && ["cliente_id", "lead_id"].includes(f.name),
-                    )
-                  }
-                  value={values[f.name] || ""}
-                  onChange={(e) =>
-                    setValues({ ...values, [f.name]: e.target.value })
-                  }
-                >
-                  <option value="">Selecione…</option>
-                  {Object.entries(f.options).map(([v, label]) => (
-                    <option key={v} value={v}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              ) : f.type === "textarea" ? (
-                <textarea
-                  required={f.required}
-                  maxLength={10000}
-                  rows={3}
-                  value={values[f.name] || ""}
-                  onChange={(e) =>
-                    setValues({ ...values, [f.name]: e.target.value })
-                  }
-                />
-              ) : (
-                <input
-                  type={f.type}
-                  required={f.required}
-                  min={f.type === "number" ? "0" : undefined}
-                  max={f.type === "number" ? "999999999999" : undefined}
-                  step={f.type === "number" ? "0.01" : undefined}
-                  maxLength={f.type === "text" ? 500 : undefined}
-                  checked={
-                    f.type === "checkbox" ? Boolean(values[f.name]) : undefined
-                  }
-                  value={
-                    f.type === "checkbox" ? undefined : (values[f.name] ?? "")
-                  }
-                  onChange={(e) =>
-                    setValues({
-                      ...values,
-                      [f.name]:
-                        f.type === "checkbox"
-                          ? e.target.checked
-                          : e.target.value,
-                    })
-                  }
-                />
-              )}
-            </label>
+            <Fragment key={f.name}>
+              <label
+                className={`field ${f.type === "textarea" ? "span-2" : ""} ${f.type === "checkbox" ? "check-field" : ""}`}
+              >
+                <span>
+                  {f.label}
+                  {f.required && " *"}
+                </span>
+                {f.type === "select" ? (
+                  <select
+                    required={f.required}
+                    disabled={
+                      busy ||
+                      Boolean(
+                        record && ["cliente_id", "lead_id"].includes(f.name),
+                      )
+                    }
+                    value={values[f.name] || ""}
+                    onChange={(e) =>
+                      setValues({ ...values, [f.name]: e.target.value })
+                    }
+                  >
+                    <option value="">Selecione…</option>
+                    {Object.entries(f.options).map(([v, label]) => (
+                      <option key={v} value={v}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                ) : f.type === "textarea" ? (
+                  <textarea
+                    required={f.required}
+                    maxLength={10000}
+                    rows={3}
+                    value={values[f.name] || ""}
+                    onChange={(e) =>
+                      setValues({ ...values, [f.name]: e.target.value })
+                    }
+                  />
+                ) : (
+                  <input
+                    type={f.type}
+                    required={f.required}
+                    min={f.type === "number" ? "0" : undefined}
+                    max={f.type === "number" ? "999999999999" : undefined}
+                    step={f.type === "number" ? "0.01" : undefined}
+                    maxLength={f.type === "text" ? 500 : undefined}
+                    checked={
+                      f.type === "checkbox"
+                        ? Boolean(values[f.name])
+                        : undefined
+                    }
+                    value={
+                      f.type === "checkbox" ? undefined : (values[f.name] ?? "")
+                    }
+                    onChange={(e) =>
+                      setValues({
+                        ...values,
+                        [f.name]:
+                          f.type === "checkbox"
+                            ? e.target.checked
+                            : e.target.value,
+                      })
+                    }
+                  />
+                )}
+              </label>
+              {f.name === "cliente_id" && creatingClient && newClientBlock()}
+            </Fragment>
           ))}
         </div>
         {table === "orcamentos" && (
