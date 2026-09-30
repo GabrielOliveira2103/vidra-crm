@@ -1,0 +1,1032 @@
+{
+  "name": "CRM - Pós Visita",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## CRM - Pós Visita: visão geral\nDois fluxos disparados pelo próprio banco. Quando um registro muda no CRM, um gatilho do Supabase chama o webhook com uma chave secreta no cabeçalho.\n\n**Linha 1:** visita marcada como realizada. **Linha 2:** orçamento marcado como enviado.",
+        "width": 900,
+        "height": 380,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -460
+      ],
+      "id": "fa84d8bb-71a9-44b0-a674-c9bad1ee6cfa",
+      "name": "Nota 0"
+    },
+    {
+      "parameters": {
+        "content": "## Fluxo 1 · Visita realizada\nO banco chama este webhook quando uma visita é marcada como realizada no CRM.",
+        "width": 460,
+        "height": 342,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6e28f455-b0dc-465d-90fe-86c9aafb220e",
+      "name": "Nota 1"
+    },
+    {
+      "parameters": {
+        "content": "## Lead aguardando orçamento\nBusca a visita, move o lead para Orçamento pendente e registra a visita no histórico.",
+        "width": 700,
+        "height": 342,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        0
+      ],
+      "id": "5c655af2-1f5f-484f-b277-0bd0a49eec20",
+      "name": "Nota 2"
+    },
+    {
+      "parameters": {
+        "content": "## Fluxo 2 · Orçamento enviado\nO banco chama este webhook quando um orçamento passa para Enviado no CRM.",
+        "width": 460,
+        "height": 342,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        602
+      ],
+      "id": "e19cb68a-2789-4467-90f2-d5abb5b67bf5",
+      "name": "Nota 3"
+    },
+    {
+      "parameters": {
+        "content": "## Busca ou cria o orçamento\nUsa o orçamento do CRM ou cria um a partir do lead.",
+        "width": 1180,
+        "height": 516,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        602
+      ],
+      "id": "fa190a49-7ac6-4788-aced-c000211f509f",
+      "name": "Nota 4"
+    },
+    {
+      "parameters": {
+        "content": "## Confere o status\nSó segue se o orçamento ainda pode ser enviado. Move o lead para Orçamento enviado.",
+        "width": 700,
+        "height": 542,
+        "color": 1
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1960,
+        602
+      ],
+      "id": "afbbaba0-cb8e-4944-bc2e-22be86a155b1",
+      "name": "Nota 5"
+    },
+    {
+      "parameters": {
+        "content": "## Envia no WhatsApp\nMonta a mensagem com os dados do orçamento, envia pela Z-API e grava a data de envio.",
+        "width": 1180,
+        "height": 316,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2820,
+        602
+      ],
+      "id": "059581e6-5e1f-48a3-b36a-dff1a0eb96a8",
+      "name": "Nota 6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d4c93cc-fa0b-4c1f-87d5-316219e3d1e4",
+              "name": "visita_id",
+              "value": "={{ $json.body.record.id }}",
+              "type": "string"
+            },
+            {
+              "id": "38515f9c-6a0f-438a-bd7d-6669ffc892b3",
+              "name": "lead_id",
+              "value": "={{ $json.body.record.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ccf244e4-bbf1-4cde-b6cb-464d0769659d",
+              "name": "cliente_id",
+              "value": "={{ $json.body.record.cliente_id }}",
+              "type": "string"
+            },
+            {
+              "id": "239c50e3-4b6b-476e-a866-32503c333594",
+              "name": "empresa_id",
+              "value": "={{ $json.body.record.empresa_id }}",
+              "type": "string"
+            },
+            {
+              "id": "6e057cbd-a0fc-4ee6-9495-7977c15db9e4",
+              "name": "status",
+              "value": "={{ $json.body.record.status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        300,
+        182
+      ],
+      "id": "7635a720-4802-4b39-9027-df5549220b08",
+      "name": "Preparar visita realizada"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "visitas",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.visita_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        680,
+        182
+      ],
+      "id": "0e09919f-0a5c-47fb-8662-36848215af2c",
+      "name": "Supabase - Buscar visita",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.lead_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "orcamento_pendente"
+            },
+            {
+              "fieldId": "resumo",
+              "fieldValue": "={{\n  'Visita técnica realizada em ' +\n  DateTime.fromISO($json.data_visita)\n    .setLocale('pt-BR')\n    .toFormat('dd/MM/yyyy') +\n  '. Aguardando elaboração e envio do orçamento.'\n}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        920,
+        182
+      ],
+      "id": "3a39bf7c-dd15-4db9-875b-d8fc665a6c02",
+      "name": "Supabase - Lead orçamento pendente",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "interacoes",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "empresa_id",
+              "fieldValue": "={{ $('Supabase - Buscar visita').first().json.empresa_id }}"
+            },
+            {
+              "fieldId": "cliente_id",
+              "fieldValue": "={{ $('Supabase - Buscar visita').first().json.cliente_id }}"
+            },
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $('Supabase - Buscar visita').first().json.lead_id }}"
+            },
+            {
+              "fieldId": "origem",
+              "fieldValue": "sistema"
+            },
+            {
+              "fieldId": "tipo",
+              "fieldValue": "observacao"
+            },
+            {
+              "fieldId": "mensagem",
+              "fieldValue": "={{\n  'Visita técnica marcada como realizada em ' +\n  DateTime.fromISO(\n    $('Supabase - Buscar visita').first().json.data_visita\n  )\n  .setLocale('pt-BR')\n  .toFormat('dd/MM/yyyy') +\n  '. Lead avançado para orçamento pendente.'\n}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        182
+      ],
+      "id": "2788a130-5ffb-46a3-ad75-7afb3ef697d6",
+      "name": "Supabase - Registrar visita realizada",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "orcamentos",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "lead_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.lead_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        680,
+        758
+      ],
+      "id": "508fae41-7b16-48b5-9867-ec3c544f6c71",
+      "name": "Supabase - Buscar orçamento",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dedf5b54-666c-40c9-958a-2bc57eaa84a0",
+              "leftValue": "={{ $json.id || '' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        920,
+        758
+      ],
+      "id": "03e2693b-e8e0-4336-96a8-f06da70a67fd",
+      "name": "Orçamento existe?"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "leads",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Preparar orçamento enviado').first().json.lead_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        958
+      ],
+      "id": "ebeb2257-3d6a-4659-ba8e-9e98697a04f5",
+      "name": "Supabase - Buscar lead orçamento",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "orcamentos",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "empresa_id",
+              "fieldValue": "={{ $json.empresa_id }}"
+            },
+            {
+              "fieldId": "cliente_id",
+              "fieldValue": "={{ $json.cliente_id }}"
+            },
+            {
+              "fieldId": "lead_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "rascunho"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1400,
+        958
+      ],
+      "id": "f677f3a6-efcc-4125-a51c-828c894ee387",
+      "name": "Supabase - Criar orçamento",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5c49158f-e79f-4f4c-ab18-6fc81a233dcc",
+              "name": "orcamento_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "dfa19ff7-8e3f-4bf0-8e3d-58baca48c4bb",
+              "name": "empresa_id",
+              "value": "={{ $json.empresa_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7edf7891-d8bf-400c-8688-792d229c9bec",
+              "name": "cliente_id",
+              "value": "={{ $json.cliente_id }}",
+              "type": "string"
+            },
+            {
+              "id": "340d79e0-2fd2-4d99-8505-1d494e77cc42",
+              "name": "lead_id",
+              "value": "={{ $json.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "c896bb0a-49d0-43c1-9d68-544347e558ec",
+              "name": "status_orcamento",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "5be047d8-80bc-4d6e-933d-b1139dab08d4",
+              "name": "valor",
+              "value": "={{ $json.valor }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1640,
+        758
+      ],
+      "id": "8c3bb23e-7708-4bed-86f5-e77de8e6d923",
+      "name": "Padronizar orçamento"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "clientes",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.cliente_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3120,
+        758
+      ],
+      "id": "cfca62a3-17d7-4f96-84a0-aaa0f61f0583",
+      "name": "Supabase - Buscar cliente orçamento",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1c20a64e-3939-43cc-a846-dbf749b5e5ef",
+              "name": "telefone",
+              "value": "={{ $json.telefone }}",
+              "type": "string"
+            },
+            {
+              "id": "15524b94-543a-41f0-b619-1ba43e62a493",
+              "name": "mensagem",
+              "value": "={{\n[\n  '📋 ORÇAMENTO - VIDRAÇARIA',\n\n  '🛠 Serviço: ' +\n    ($('Supabase - Buscar lead para mensagem').first().json.servico || 'Não informado'),\n\n  '📝 ' +\n    ($('Supabase - Buscar orçamento').first().json.descricao || 'Orçamento referente ao serviço solicitado.'),\n\n  '💰 Valor: ' +\n    Number($('Supabase - Buscar orçamento').first().json.valor)\n      .toLocaleString('pt-BR', {\n        style: 'currency',\n        currency: 'BRL'\n      }),\n\n  '📅 Validade: ' +\n    DateTime.fromISO(\n      $('Supabase - Buscar orçamento').first().json.validade\n    )\n    .setLocale('pt-BR')\n    .toFormat('dd/MM/yyyy'),\n\n  'Se tiver alguma dúvida sobre o orçamento, é só me chamar.'\n].join('\\n\\n')\n}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3360,
+        758
+      ],
+      "id": "488265f3-4464-4b52-889e-b44e08da367c",
+      "name": "Preparar mensagem orçamento"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.z-api.io/instances/SUA_INSTANCIA/token/SEU_TOKEN/send-text",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "client-token",
+              "value": "SEU_CLIENT_TOKEN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"phone\": \"{{ $json.telefone }}\",\n  \"message\": {{ JSON.stringify($json.mensagem) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3600,
+        758
+      ],
+      "id": "440aa70f-f948-4370-8ae5-066cdb612d07",
+      "name": "Z-API - Enviar orçamento"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "orcamentos",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Padronizar orçamento').first().json.orcamento_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "enviado"
+            },
+            {
+              "fieldId": "enviado_em",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3840,
+        758
+      ],
+      "id": "0224f4e5-1c4c-484b-a1e4-615f0bed9479",
+      "name": "Supabase - Marcar orçamento enviado",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bfe105cb-49ec-4700-8618-09d578ad1002",
+              "leftValue": "={{ $json.status_orcamento }}",
+              "rightValue": "enviado",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2020,
+        784
+      ],
+      "id": "b8f10cfa-593a-4a2f-b551-d03f2b62797d",
+      "name": "Orçamento pode ser editado?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5a80ee19-555e-4891-9506-01318a1bcd87",
+              "leftValue": "={{ $json.status_orcamento }}",
+              "rightValue": "enviado",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2260,
+        984
+      ],
+      "id": "6da8f58d-d376-467e-a022-24d6ce03cf04",
+      "name": "Orçamento está enviado?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.lead_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "orcamento_enviado"
+            },
+            {
+              "fieldId": "resumo",
+              "fieldValue": "={{\n  'Orçamento enviado ao cliente no valor de ' +\n  Number($json.valor)\n    .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) +\n  '. Aguardando retorno do cliente.'\n}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2500,
+        984
+      ],
+      "id": "bcce7cad-54f0-49e4-a5e0-a96b3d4b8b09",
+      "name": "Supabase - Lead orçamento enviado",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "crm-visita-realizada",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        60,
+        182
+      ],
+      "id": "70f5c677-1abc-45f2-ab64-3e58b0bd37bc",
+      "name": "Webhook - Visita realizada",
+      "webhookId": "2bb914cf-73cb-48eb-b8f4-550cc834cf8a",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "crm-orcamento-enviado",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        60,
+        784
+      ],
+      "id": "c97c905d-57d2-4862-802f-912199fb5130",
+      "name": "Webhook - Orçamento enviado",
+      "webhookId": "c2558768-0862-4642-a652-52cca32b44a6",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c219775b-83a1-443f-8266-fd9d4066cbfb",
+              "name": "orcamento_id",
+              "value": "={{ $json.body.record.id }}",
+              "type": "string"
+            },
+            {
+              "id": "b85aa59d-5cb3-4895-98a1-36f5d5d75dfc",
+              "name": "lead_id",
+              "value": "={{ $json.body.record.lead_id }}",
+              "type": "string"
+            },
+            {
+              "id": "820692a2-73e1-4bac-a6aa-dddd9cf59ba6",
+              "name": "cliente_id",
+              "value": "={{ $json.body.record.cliente_id }}",
+              "type": "string"
+            },
+            {
+              "id": "d92ac7df-014d-4fbd-8aa3-a81384b70e49",
+              "name": "empresa_id",
+              "value": "={{ $json.body.record.empresa_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        300,
+        784
+      ],
+      "id": "b4ece9c0-57f1-4493-bd23-ee74c7985eb1",
+      "name": "Preparar orçamento enviado"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "leads",
+        "limit": 1,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Supabase - Buscar orçamento').first().json.lead_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2880,
+        758
+      ],
+      "id": "5c929926-525d-46ed-957d-1fe2f02dbcc0",
+      "name": "Supabase - Buscar lead para mensagem",
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Supabase - Buscar visita": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Lead orçamento pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Lead orçamento pendente": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Registrar visita realizada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Buscar orçamento": {
+      "main": [
+        [
+          {
+            "node": "Orçamento existe?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orçamento existe?": {
+      "main": [
+        [
+          {
+            "node": "Padronizar orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase - Buscar lead orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Buscar lead orçamento": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Criar orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Criar orçamento": {
+      "main": [
+        [
+          {
+            "node": "Padronizar orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Padronizar orçamento": {
+      "main": [
+        [
+          {
+            "node": "Orçamento pode ser editado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Buscar cliente orçamento": {
+      "main": [
+        [
+          {
+            "node": "Preparar mensagem orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar mensagem orçamento": {
+      "main": [
+        [
+          {
+            "node": "Z-API - Enviar orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Z-API - Enviar orçamento": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Marcar orçamento enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orçamento pode ser editado?": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Buscar lead para mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Orçamento está enviado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orçamento está enviado?": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Lead orçamento enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Lead orçamento enviado": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Buscar lead para mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Buscar lead para mensagem": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Buscar cliente orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Visita realizada": {
+      "main": [
+        [
+          {
+            "node": "Preparar visita realizada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Orçamento enviado": {
+      "main": [
+        [
+          {
+            "node": "Preparar orçamento enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar visita realizada": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Buscar visita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar orçamento enviado": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Buscar orçamento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  }
+}

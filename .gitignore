@@ -6,3 +6,6 @@ dist/
 test-results/
 playwright-report/
 *.log
+
+# Exports brutos do n8n (podem conter tokens). Só a versão limpa em n8n/ vai para o Git.
+n8n/_originais/

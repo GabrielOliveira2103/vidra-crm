@@ -42,6 +42,8 @@ flowchart LR
 - **CRM:** a equipe acompanha o funil, edita registros e envia orçamentos. Mudanças aparecem na hora via Supabase Realtime.
 - **Automações de volta:** quando um orçamento é marcado como enviado ou uma visita como realizada, o banco dispara um webhook para o n8n, que envia a mensagem ao cliente pelo WhatsApp.
 
+Os workflows do n8n estão em [n8n/](n8n/), com notas explicando cada etapa.
+
 ## Stack
 
 React 19 · Vite · React Router · Supabase (PostgreSQL, Auth, Storage, Realtime, Vault, pg_net) · Recharts · n8n · Z-API · Vercel
